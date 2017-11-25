@@ -1,3 +1,5 @@
+from math import sqrt
+
 #A dictionary of movie critics and their ratings of a small set of movies
 critics = {
     'Lisa Rose': {
@@ -50,3 +52,28 @@ critics = {
         'You, Me and Dupree': 1.0
     }
 }
+
+#returns a distance-based similarity score for person 1 and person2
+def sim_distance(prefs, person1, person2):
+    #Get the list of shared_items
+    si = {}
+    for item in prefs[person1]:
+        if item in prefs[person2]:
+            si[item] = 1
+
+    #if they have no ratings in common return 0
+    if len(si) == 0:
+        return 0
+
+
+    # add up the squares of all the differences
+    sum_of_squares = sum([pow(prefs[person1][item] - prefs[person2][item], 2)
+                            for item in prefs[person1] if item in prefs[person2]])
+
+    #return 1/(1 + sqrt(sum_of_squares))
+    return 1/(1 + sum_of_squares)
+
+
+if __name__ == "__main__":
+    distance = sim_distance(critics, 'Lisa Rose', 'Gene Seymour')
+    print "Euclidean distance score between Lisa Rose and Gene Seymour = ", distance
