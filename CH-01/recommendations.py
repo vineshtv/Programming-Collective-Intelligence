@@ -111,9 +111,25 @@ def sim_pearson(prefs, person1, person2):
 
     return r
 
+#Returns the best matches for person from prefs dictionary
+# number of results and similarity function are optional params.
+def topMatches(prefs, person, n = 5, similarity = sim_pearson):
+    scores = [(similarity(prefs, person, other), other) 
+                        for other in prefs if other != person]
+
+    #sort the list so the highest score appears at the top
+    scores.sort()
+    scores.reverse()
+    return scores[0:n]
+
+
+
 if __name__ == "__main__":
     distance = sim_distance(critics, 'Lisa Rose', 'Gene Seymour')
     print "Euclidean distance score between Lisa Rose and Gene Seymour = ", distance
 
     pearsonScore = sim_pearson(critics, 'Lisa Rose', 'Gene Seymour')
     print "Pearson score for Lisa Rose and Gene Seymour = ", pearsonScore
+
+    Knearest = topMatches(critics, 'Toby', n = 3)
+    print "nearest matches for Toby = ", Knearest
