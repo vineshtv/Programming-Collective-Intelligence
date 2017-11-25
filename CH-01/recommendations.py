@@ -123,6 +123,37 @@ def topMatches(prefs, person, n = 5, similarity = sim_pearson):
     return scores[0:n]
 
 
+# Gets recommendations for a person by using a weighted average of every other user's ranking
+def getRecommendations(prefs, person, similarity=sim_pearson):
+    totals = {}
+    simSums = {}
+    for other in prefs:
+        if other == person:
+            continue
+        
+        sim = similarity(prefs, person, other)
+
+        #ignore scores of zero ir lower
+        if sim <= 0:
+            continue
+        
+        for item in prefs[other]:
+            #only score movies that are not reviewed by "person"
+            if item not in prefs[person] or prefs[person][item] == 0:
+                totals.setdefault(item, 0)
+                totals[item] += prefs[other][item] * sim
+
+                simSums.setdefault(item, 0)
+                simSums[item] += sim
+
+    #create the normalised list
+    rankings = [(total/simSums[item], item) for item, total in totals.items()]
+
+    #return the sorted list
+    rankings.sort()
+    rankings.reverse()
+    return rankings
+
 
 if __name__ == "__main__":
     distance = sim_distance(critics, 'Lisa Rose', 'Gene Seymour')
@@ -133,3 +164,6 @@ if __name__ == "__main__":
 
     Knearest = topMatches(critics, 'Toby', n = 3)
     print "nearest matches for Toby = ", Knearest
+
+    recommendation = getRecommendations(critics, 'Toby')
+    print "Recommendations for Toby = ", recommendation
